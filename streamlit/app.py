@@ -15,8 +15,8 @@ if new_class:
 classes = st.multiselect('Classes', st.session_state['classes'],
                          default=st.session_state['classes'])
 
-image_threshold = st.number_input('Image threshold', 18)
-video_threshold = st.number_input('Video threshold', 18)
+image_threshold = st.number_input('Image threshold', value=18)
+video_threshold = st.number_input('Video threshold', value=18)
 
 mastodon_social_feed = []
 with st.spinner('Loading Mastodon.social federated feed'):
