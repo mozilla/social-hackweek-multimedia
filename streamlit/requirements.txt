@@ -1,0 +1,9 @@
+streamlit==1.21.0
+beautifulsoup4
+pytube
+Mastodon.py
+numpy
+pandas
+scikit-learn
+beautifulsoup4
+requests
