@@ -40,8 +40,6 @@ def render_feed_with_predictions(all_data, limit):
                 col.markdown(f'<img src={image_urls[0]} alt="" width="250" height="250"> ', unsafe_allow_html=True)
             elif j == 2:
                 col.markdown('Not sensitive', unsafe_allow_html=True)
-            # elif j == 3:
-            #     col.markdown(, unsafe_allow_html=True)
         write_html('<hr/>')
 
 
