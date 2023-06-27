@@ -16,6 +16,6 @@ deactivate
 
 ### Run streamlit app
 ```
-streamlit app.py
+streamlit run app.py
 ```
 

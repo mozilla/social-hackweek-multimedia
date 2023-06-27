@@ -7,3 +7,6 @@ pandas
 scikit-learn
 beautifulsoup4
 requests
+transformers
+torch
+av
