@@ -58,6 +58,7 @@ temp_mastodon_social_feed = []
 MASTODON_FEED = 'MASTODON_FEED'
 MASTODON_FEED_TEMP = 'MASTODON_FEED_TEMP'
 SEARCH = 'search'
+UNBLUR_IMAGES = 'UNBLUR_IMAGES'
 
 
 Mastodon.create_app(
@@ -84,6 +85,12 @@ if st.button(label='Refresh data', key='refresh'):
     st.session_state[MASTODON_FEED] = mastodon_social_feed
     st.session_state[MASTODON_FEED_TEMP] = mastodon_social_feed.copy()
     st.experimental_rerun()
+
+check = st.checkbox('Unblur images')
+if check:
+    st.session_state[UNBLUR_IMAGES] = True
+else:
+    st.session_state[UNBLUR_IMAGES] = False
 
 
 def render_feed_with_predictions(all_data, limit):
@@ -114,9 +121,8 @@ def render_feed_with_predictions(all_data, limit):
                 col.markdown(content_html if len(content_html) > 0 else 'No content', unsafe_allow_html=True)
             elif j == 1:
                 should_blur = [s[0] for s in scores if s[0] in Classes.get_nsfw_classes()]
-                blur_str = 'style="filter: blur(15px);"' if should_blur else ''
+                blur_str = 'style="filter: blur(15px);"' if (should_blur and not st.session_state[UNBLUR_IMAGES]) else ''
                 col.markdown(f'<img src={image_urls[0]} {blur_str} alt="" width="250" height="250">', unsafe_allow_html=True)
-                col.markdown(f'<a href={image_urls[0]}>Image link</a>', unsafe_allow_html=True)
             elif j == 2:
                     if scores:
                         col.write(str(scores))
