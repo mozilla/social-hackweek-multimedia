@@ -16,6 +16,7 @@ video_model = AutoModel.from_pretrained("microsoft/xclip-base-patch32")
 
 
 def classify_image(url, texts, threshold=18):
+    print(f'Processing image {url}')
     image = Image.open(requests.get(url, stream=True).raw)
 
     inputs = image_processor(text=texts, images=image, return_tensors="pt", padding=True)
@@ -62,6 +63,7 @@ def _sample_frame_indices(clip_len, frame_sample_rate, seg_len):
 
 
 def classify_video(url, texts, threshold):
+    print(f'Processing video {url}')
     container = av.open(url)
 
     # sample 8 frames
