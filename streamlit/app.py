@@ -26,27 +26,24 @@ SEARCH = 'search'
 
 st.set_page_config(layout="wide")
 
+Mastodon.create_app(
+    'hack-posttoots',
+    api_base_url='https://mastodon.social',
+    scopes=['read', 'write'],
+    to_file='.secrets'
+)
+mastodon = Mastodon(
+    client_id='.secrets',
+)
 
 with st.spinner('Loading Mastodon.social federated feed'):
     # run this only once to create the secrets file
     if MASTODON_FEED not in st.session_state:
-        Mastodon.create_app(
-            'hack-posttoots',
-            api_base_url='https://mastodon.social',
-            scopes=['read', 'write'],
-            to_file='.secrets'
-        )
-        mastodon = Mastodon(
-            client_id='.secrets',
-        )
         mastodon_social_feed = mastodon.timeline_public(only_media=True, limit=10)
         st.session_state[MASTODON_FEED] = mastodon_social_feed
         st.session_state[MASTODON_FEED_TEMP] = mastodon_social_feed.copy()
         st.session_state[SEARCH] = ''
 
-mastodon = Mastodon(
-    client_id='.secrets',
-)
 
 if st.button(label='Refresh data', key='refresh'):
     mastodon_social_feed = mastodon.timeline_public(only_media=True, limit=10)
