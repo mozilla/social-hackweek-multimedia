@@ -68,20 +68,5 @@ def download_image(link, image_name):
   return
 
 
-def search(data, search_term):
-    search_term = search_term.lower()
-    all_filtered = []
-    for d in data:
-        content = d['content'].lower()
-        if search_term in content:
-            all_filtered.append(d)
-            continue
-        media_attachments = d['media_attachments']
-        media_attachments_descriptions = [m['description'].lower() for m in media_attachments if
-                                          m['description'] is not None]
-        for md in media_attachments_descriptions:
-            if search_term in md:
-                all_filtered.append(d)
-                break
-    return all_filtered
-
+def search(query, mt):
+  return mt.timeline_hashtag(query)
