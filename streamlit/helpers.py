@@ -28,14 +28,24 @@ def image_validation(filename):
     return image_regex_match
   return image_regex_match
 
+def video_validation(filename):
+  video_regex = (r'(.*)(\w+)(.mp4)')
+  video_regex_match = re.match(video_regex, filename)
+  if video_regex_match:
+    return video_regex_match
+  return video_regex_match
+
+def grab_video_link(link):
+  if video_validation(link):
+    return link
+  return None
 
 def grab_image_link(link):
   if image_validation(link):
     return link
   return None
 
-
-def grab_video_link(link):
+def grab_youtube_link(link):
   if youtube_url_validation(link):
     return link
   return None
@@ -44,19 +54,32 @@ def grab_video_link(link):
 def grab_links(status_obj):
   image_urls = []
   video_urls = []
+  youtube_urls = []
+  preview_urls = []
+
   for media_attachment in status_obj['media_attachments']:
     p_image_url = grab_image_link(media_attachment['url'])
     if p_image_url:
       image_urls.append(p_image_url)
 
-  soup = BeautifulSoup(status_obj['content'])
-  for a_tag in soup.findAll('a'):
-    p_video_url = grab_video_link(a_tag.get('href'))
+    p_video_url = grab_video_link(media_attachment['url'])
     if p_video_url:
       video_urls.append(p_video_url)
+      preview_url = grab_image_link(media_attachment['preview_url'])
+      if preview_url:
+        preview_urls.append(preview_url)
+
+
+  soup = BeautifulSoup(status_obj['content'])
+  for a_tag in soup.findAll('a'):
+    p_youtube_url = grab_video_link(a_tag.get('href'))
+    if p_youtube_url:
+      youtube_urls.append(p_youtube_url)
   url_dict = {
       'image_urls': image_urls,
-      'video_urls': video_urls
+      'video_urls': video_urls,
+      'youtue_urls': youtube_urls,
+      'preview_urls': preview_urls
   }
   return url_dict
 
@@ -68,5 +91,5 @@ def download_image(link, image_name):
   return
 
 
-def search(query, mt):
-  return mt.timeline_hashtag(query)
+def search(query, mt, limit=100):
+  return mt.timeline_hashtag(query, limit=limit, only_media=True)
