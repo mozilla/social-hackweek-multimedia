@@ -114,8 +114,9 @@ def render_feed_with_predictions(all_data, limit):
                 col.markdown(content_html if len(content_html) > 0 else 'No content', unsafe_allow_html=True)
             elif j == 1:
                 should_blur = [s[0] for s in scores if s[0] in Classes.get_nsfw_classes()]
-                blur_str = 'style="filter: blur(15px);"' if should_blur else ''
-                col.markdown(f'<img src={image_urls[0]} {blur_str} alt="" width="250" height="250"> ', unsafe_allow_html=True)
+                blur_str = 'style="filter: blur(15px); :hover {filter: blur(0)}"' if should_blur else ''
+                col.markdown(f'<img src={image_urls[0]} {blur_str} alt="" width="250" height="250">', unsafe_allow_html=True)
+                col.markdown(f'<a href={image_urls[0]}>Image link</a>', unsafe_allow_html=True)
             elif j == 2:
                     if scores:
                         col.write(str(scores))
@@ -130,7 +131,7 @@ def render():
         st.session_state[SEARCH] = search_string
         corpus_submit_button = st.form_submit_button(label='Search')
         if corpus_submit_button or search_string:
-            st.session_state[MASTODON_FEED_TEMP] = search(st.session_state[MASTODON_FEED], search_string)
+            st.session_state[MASTODON_FEED_TEMP] = search(search_string, mastodon)
         render_feed_with_predictions(st.session_state[MASTODON_FEED_TEMP], 10)
 
 
