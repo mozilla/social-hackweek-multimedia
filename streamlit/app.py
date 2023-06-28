@@ -1,10 +1,45 @@
+from typing import List
+
 import streamlit as st
 from mastodon import Mastodon
 
 from helpers import write_html, grab_links, search
 from classifiers import classify_image, classify_video
 
-all_classes = {"adult content", "spoof", "medical", "violence", "racy", "war", 'politics'}
+from enum import Enum
+
+
+st.set_page_config(layout="wide")
+
+
+class Classes(Enum):
+    ADULT_CONTENT = 'adult content'
+    SPOOF = 'spoof'
+    MEDICAL = 'medical'
+    VIOLENCE = 'violence'
+    RACY = 'racy'
+    WAR = 'war'
+    POLITICS = 'politics'
+
+    @classmethod
+    def is_nsfw(cls, class_str: str) -> bool:
+        return class_str in [cls.ADULT_CONTENT.value, cls.RACY.value]
+
+    @classmethod
+    def get_nsfw_classes(cls) -> List:
+        return [cls.ADULT_CONTENT.value, cls.RACY.value]
+
+
+all_classes = {
+    Classes.ADULT_CONTENT.value,
+    Classes.SPOOF.value,
+    Classes.MEDICAL.value,
+    Classes.VIOLENCE.value,
+    Classes.RACY.value,
+    Classes.WAR.value,
+    Classes.RACY.value
+}
+
 if 'classes' not in st.session_state:
     st.session_state['classes'] = all_classes
 
@@ -24,7 +59,6 @@ MASTODON_FEED = 'MASTODON_FEED'
 MASTODON_FEED_TEMP = 'MASTODON_FEED_TEMP'
 SEARCH = 'search'
 
-st.set_page_config(layout="wide")
 
 Mastodon.create_app(
     'hack-posttoots',
@@ -70,16 +104,19 @@ def render_feed_with_predictions(all_data, limit):
             video_urls = urls['video_urls']
             if (not image_urls and not video_urls) or len(image_urls) == 0:
                 continue
+
+            with st.spinner('Running model'):
+                if image_urls:
+                    scores = classify_image(image_urls[0], classes, image_threshold)
+                elif video_urls:
+                    scores = classify_video(video_urls[0], classes, video_threshold)
             if j == 0:
                 col.markdown(content_html if len(content_html) > 0 else 'No content', unsafe_allow_html=True)
             elif j == 1:
-                col.markdown(f'<img src={image_urls[0]} alt="" width="250" height="250"> ', unsafe_allow_html=True)
+                should_blur = [s[0] for s in scores if s[0] in Classes.get_nsfw_classes()]
+                blur_str = 'style="filter: blur(15px);"' if should_blur else ''
+                col.markdown(f'<img src={image_urls[0]} {blur_str} alt="" width="250" height="250"> ', unsafe_allow_html=True)
             elif j == 2:
-                with st.spinner('Running model'):
-                    if image_urls:
-                        scores = classify_image(image_urls[0], classes, image_threshold)
-                    elif video_urls:
-                        scores = classify_video(video_urls[0], classes, video_threshold)
                     if scores:
                         col.write(str(scores))
 
