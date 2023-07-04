@@ -1,5 +1,5 @@
 # social-hackweek-multimedia
-Artifacts related to exploration of multimedia content on social networks
+Exploration of processing multimedia content on social networks with AI
 
 
 ### Install dependencies 
